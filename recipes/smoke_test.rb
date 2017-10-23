@@ -36,8 +36,9 @@ admin_user = node['openstack']['identity']['admin_user']
 admin_project = node['openstack']['identity']['admin_project']
 
 # NOTE: This has to be done in a ruby_block so it gets executed at execution
-#       time and not compile time (when nova does not yet exist).
-ruby_block 'smoke_test_for_barbican_secrets' do
+#       time and not compile time (when barbican does not yet exist).
+# Ignore FC014 (we don't want to extract this long ruby_block to a library)
+ruby_block 'smoke_test_for_barbican_secrets' do # ~FC014
   block do
     begin
       env = openstack_command_env(admin_user, admin_project, 'Default', 'Default')
@@ -45,14 +46,9 @@ ruby_block 'smoke_test_for_barbican_secrets' do
       openstack_command('barbican', 'secret store --name chef_test_secret', env)
 
       # Get URI for secret.
-      # This does not work:
-      # all_fields = openstack_command('barbican', 'secret list', env, {'name': 'chef_test_secret', 'format': 'value'})
-      #   -> barbican --name chef_test_secret --format value secret list
-
-      # openstack_command splits -c"Secret href" on whitespace into two
-      # arguments, so we can't get just the column of interest
-      all_fields = openstack_command('barbican', 'secret list --name chef_test_secret -fvalue', env)
-      sec_uri = all_fields.split[0]
+      sec_uri = openstack_command('barbican', ['secret', 'list', '--name',
+                                   'chef_test_secret', '-fvalue',
+                                   '-cSecret href'], env)
 
       # Write payload.
       openstack_command('barbican', "secret update #{sec_uri} my_payload", env)

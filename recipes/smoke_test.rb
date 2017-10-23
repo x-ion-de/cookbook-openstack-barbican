@@ -36,8 +36,9 @@ admin_user = node['openstack']['identity']['admin_user']
 admin_project = node['openstack']['identity']['admin_project']
 
 # NOTE: This has to be done in a ruby_block so it gets executed at execution
-#       time and not compile time (when nova does not yet exist).
-ruby_block 'smoke_test_for_barbican_secrets' do
+#       time and not compile time (when barbican does not yet exist).
+# Ignore FC014 (we don't want to extract this long ruby_block to a library)
+ruby_block 'smoke_test_for_barbican_secrets' do # ~FC014
   block do
     begin
       env = openstack_command_env(admin_user, admin_project, 'Default', 'Default')

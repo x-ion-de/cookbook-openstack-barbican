@@ -46,14 +46,9 @@ ruby_block 'smoke_test_for_barbican_secrets' do # ~FC014
       openstack_command('barbican', 'secret store --name chef_test_secret', env)
 
       # Get URI for secret.
-      # This does not work:
-      # all_fields = openstack_command('barbican', 'secret list', env, {'name': 'chef_test_secret', 'format': 'value'})
-      #   -> barbican --name chef_test_secret --format value secret list
-
-      # openstack_command splits -c"Secret href" on whitespace into two
-      # arguments, so we can't get just the column of interest
-      all_fields = openstack_command('barbican', 'secret list --name chef_test_secret -fvalue', env)
-      sec_uri = all_fields.split[0]
+      sec_uri = openstack_command('barbican', ['secret', 'list', '--name',
+                                   'chef_test_secret', '-fvalue',
+                                   '-cSecret href'], env)
 
       # Write payload.
       openstack_command('barbican', "secret update #{sec_uri} my_payload", env)

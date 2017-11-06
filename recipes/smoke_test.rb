@@ -47,8 +47,8 @@ ruby_block 'smoke_test_for_barbican_secrets' do # ~FC014
 
       # Get URI for secret.
       sec_uri = openstack_command('barbican', ['secret', 'list', '--name',
-                                   'chef_test_secret', '-fvalue',
-                                   '-cSecret href'], env)
+                                               'chef_test_secret', '-fvalue',
+                                               '-cSecret href'], env)
 
       # Write payload.
       openstack_command('barbican', "secret update #{sec_uri} my_payload", env)

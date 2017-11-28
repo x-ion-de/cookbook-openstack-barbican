@@ -39,3 +39,7 @@ default['openstack']['key-manager']['service_role'] = 'service'
   default['openstack']['endpoints'][ep_type]['key-manager']['path'] = ''
   default['openstack']['endpoints'][ep_type]['key-manager']['port'] = 9311
 end
+
+# Needed for haproxy
+default['openstack']['bind_service']['all']['key-manager']['host'] = '127.0.0.1'
+default['openstack']['bind_service']['all']['key-manager']['port'] = 9311
